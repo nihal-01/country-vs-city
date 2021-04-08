@@ -66,14 +66,20 @@ const getLoaclStorage = () => {
 };
 
 function CityCard({ data }) {
-  const [global, setGlobal] = React.useState(true);
-  const [view, setView] = React.useState(false);
-  const [save, setSave] = React.useState(false);
+  const {
+    saveCity,
+    cityData,
+    setView,
+    viewMore,
+    save,
+    setSaving,
+    settingGlobal,
+    global,
+  } = useGlobalContext();
+
   const [state, setState] = React.useState({
     widgets: global ? data : getLoaclStorage(),
   });
-
-  const { saveData, cityData } = useGlobalContext();
 
   const getShowLessList = (data) => {
     if (data) {
@@ -86,12 +92,12 @@ function CityCard({ data }) {
   React.useEffect(() => {
     setState({
       widgets: global
-        ? view
+        ? viewMore
           ? cityData
           : getShowLessList(cityData)
         : getLoaclStorage(),
     });
-  }, [cityData, global, view]);
+  }, [cityData, global, viewMore]);
 
   function onDragEnd(result) {
     const { source, destination } = result;
@@ -136,46 +142,97 @@ function CityCard({ data }) {
   }
 
   const handleSubmit = () => {
-    setSave(true);
-    let value = "city";
-    localStorage.setItem(value, JSON.stringify(state.widgets));
-    saveData(state.widgets, value);
+    if (save === true) {
+      let value = "city";
+      saveCity(state.widgets, value);
+      if (state.widgets) {
+        if (state.widgets["column-1"]) {
+          var nitems = state.widgets["column-1"].filter((item) => {
+            return item.spam_score < 2;
+          });
+        }
+
+        if (state.widgets["column-2"]) {
+          var nspamItems = state.widgets["column-2"].filter((item) => {
+            return item.spam_score < 2;
+          });
+        }
+
+        let localItem = { "column-1": nitems, "column-2": nspamItems };
+        localStorage.setItem(value, JSON.stringify(localItem));
+      }
+    }
   };
+
+  let isSave = save === true;
+
+  React.useEffect(() => {
+    handleSubmit();
+  }, [isSave]);
 
   React.useEffect(() => {
     const timout = setTimeout(() => {
-      setSave(false);
+      setSaving(false);
     }, 1000);
     return () => clearTimeout(timout);
-  }, [save]);
+  }, [isSave]);
 
   if (!state.widgets) {
-    return <p className='no-cards-found'>no cards found !!!</p>;
+    return (
+      <section>
+        <p className='no-cards-found'>no cards found !!!</p>
+        <div className='bottom-btn-wrapper'>
+          <div className='save-btn-wrapper'>
+            <button onClick={() => setSaving(true)} className='save-btn'>
+              {save ? "Saving..." : "Save"}
+            </button>
+            <button
+              onClick={() => settingGlobal(!global)}
+              className='global-btn'>
+              {global ? "Local" : "Global"}
+            </button>
+          </div>
+          <button onClick={() => setView(!viewMore)} className='view-more-btn'>
+            {viewMore ? "View Less" : "View More"}
+          </button>
+        </div>
+      </section>
+    );
   }
 
-  return (
-    <section>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div>
-          <Column widgets={state.widgets["column-1"]} droppableId='column-1' />
-          <Column widgets={state.widgets["column-2"]} droppableId='column-2' />
-        </div>
-      </DragDropContext>
-      <div className='bottom-btn-wrapper'>
-        <div className='save-btn-wrapper'>
-          <button onClick={handleSubmit} className='save-btn'>
-            {save ? "Saving..." : "Save"}
+  if (state.widgets) {
+    return (
+      <section>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div>
+            <Column
+              widgets={state.widgets["column-1"]}
+              droppableId='column-1'
+            />
+            <Column
+              widgets={state.widgets["column-2"]}
+              droppableId='column-2'
+            />
+          </div>
+        </DragDropContext>
+        <div className='bottom-btn-wrapper'>
+          <div className='save-btn-wrapper'>
+            <button onClick={() => setSaving(true)} className='save-btn'>
+              {save ? "Saving..." : "Save"}
+            </button>
+            <button
+              onClick={() => settingGlobal(!global)}
+              className='global-btn'>
+              {global ? "Local" : "Global"}
+            </button>
+          </div>
+          <button onClick={() => setView(!viewMore)} className='view-more-btn'>
+            {viewMore ? "View Less" : "View More"}
           </button>
-          <button onClick={() => setGlobal(!global)} className='global-btn'>
-            {global ? "Local" : "Global"}
-          </button>
         </div>
-        <button onClick={() => setView(!view)} className='view-more-btn'>
-          {view ? "View Less" : "View More"}
-        </button>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  }
 }
 
 export default CityCard;

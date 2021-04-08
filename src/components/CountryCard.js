@@ -66,14 +66,18 @@ const getLoaclStorage = () => {
 };
 
 function CountryCard({ data }) {
-  const [global, setGlobal] = React.useState(true);
-  const [view, setView] = React.useState(false);
-  const [save, setSave] = React.useState(false);
+  const {
+    saveCountry,
+    countryData,
+    viewMore,
+    save,
+    setSaving,
+    global,
+  } = useGlobalContext();
+
   const [state, setState] = React.useState({
     widgets: global ? data : getLoaclStorage(),
   });
-
-  const { saveData, countryData } = useGlobalContext();
 
   const getShowLessList = (data) => {
     if (data) {
@@ -86,12 +90,12 @@ function CountryCard({ data }) {
   React.useEffect(() => {
     setState({
       widgets: global
-        ? view
+        ? viewMore
           ? countryData
           : getShowLessList(countryData)
         : getLoaclStorage(),
     });
-  }, [countryData, global, view]);
+  }, [countryData, global, viewMore]);
 
   function onDragEnd(result) {
     const { source, destination } = result;
@@ -136,18 +140,40 @@ function CountryCard({ data }) {
   }
 
   const handleSubmit = () => {
-    setSave(true);
-    let value = "country";
-    localStorage.setItem(value, JSON.stringify(state.widgets));
-    saveData(state.widgets, value);
+    if (save === true) {
+      let value = "country";
+      saveCountry(state.widgets, value);
+      if (state.widgets) {
+        if (state.widgets["column-1"]) {
+          var nitems = state.widgets["column-1"].filter((item) => {
+            return item.spam_score < 2;
+          });
+        }
+
+        if (state.widgets["column-2"]) {
+          var nspamItems = state.widgets["column-2"].filter((item) => {
+            return item.spam_score < 2;
+          });
+        }
+
+        let localItem = { "column-1": nitems, "column-2": nspamItems };
+        localStorage.setItem(value, JSON.stringify(localItem));
+      }
+    }
   };
+
+  let isSave = save === true;
+
+  React.useEffect(() => {
+    handleSubmit();
+  }, [isSave]);
 
   React.useEffect(() => {
     const timout = setTimeout(() => {
-      setSave(false);
+      setSaving(false);
     }, 1000);
     return () => clearTimeout(timout);
-  }, [save]);
+  }, [isSave]);
 
   if (!state.widgets) {
     return <p className='no-cards-found'>no cards found !!!</p>;
@@ -161,19 +187,22 @@ function CountryCard({ data }) {
           <Column widgets={state.widgets["column-2"]} droppableId='column-2' />
         </div>
       </DragDropContext>
-      <div className='bottom-btn-wrapper'>
+      {/* <div className='bottom-btn-wrapper'>
         <div className='save-btn-wrapper'>
-          <button disabled={save} onClick={handleSubmit} className='save-btn'>
+          <button
+            disabled={save}
+            onClick={() => setSaving(true)}
+            className='save-btn'>
             {save ? "Saving..." : "Save"}
           </button>
-          <button onClick={() => setGlobal(!global)} className='global-btn'>
+          <button onClick={() => settingGlobal(!global)} className='global-btn'>
             {global ? "Local" : "Global"}
           </button>
         </div>
-        <button onClick={() => setView(!view)} className='view-more-btn'>
-          {view ? "View Less" : "View More"}
+        <button onClick={() => setView(!viewMore)} className='view-more-btn'>
+          {viewMore ? "View Less" : "View More"}
         </button>
-      </div>
+      </div> */}
     </section>
   );
 }

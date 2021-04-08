@@ -15,6 +15,14 @@ const initialState = {
 const AppProvider = ({ children }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
+  const [viewMore, setViewMore] = React.useState(false);
+  const [save, setSave] = React.useState(false);
+  const [global, setGlobal] = React.useState(true);
+
+  const settingGlobal = () => {
+    setGlobal(!global);
+  };
+
   const addCard = (value, text) => {
     database.ref(`cards/${value}/${new Date().getTime().toString()}`).set({
       text,
@@ -22,6 +30,10 @@ const AppProvider = ({ children }) => {
       votes: 0,
     });
   };
+
+  const setSaving = (val) => setSave(val);
+
+  const setView = () => setViewMore(!viewMore);
 
   const getCards = () => {
     dispatch({ type: START_FETCH });
@@ -45,24 +57,56 @@ const AppProvider = ({ children }) => {
     );
   };
 
-  const saveData = (result, value) => {
-    result["column-1"].map((item, index) => {
-      return database
-        .ref(`cards/${value}/${item.id}`)
-        .update({ votes: item.votes + (result["column-1"].length - index) });
-    });
-    if (result["column-2"].length > 0) {
-      result["column-2"].map((item) => {
-        return database
-          .ref(`cards/${value}/${item.id}`)
-          .update({ spam_score: item.spam_score + 1 });
-      });
-      result["column-2"].map((item) => {
-        if (item.spam_score >= 2) {
-          return database.ref(`cards/${value}/${item.id}`).remove();
-        }
-        return 0;
-      });
+  const saveCountry = (result, value) => {
+    if (result) {
+      if (result["column-1"]) {
+        result["column-1"].map((item, index) => {
+          return database.ref(`cards/${value}/${item.id}`).update({
+            votes: item.votes + (result["column-1"].length - index),
+          });
+        });
+      }
+
+      if (result["column-2"].length > 0) {
+        result["column-2"].map((item) => {
+          return database
+            .ref(`cards/${value}/${item.id}`)
+            .update({ spam_score: item.spam_score + 1 });
+        });
+        result["column-2"].map((item) => {
+          if (item.spam_score >= 2) {
+            return database.ref(`cards/${value}/${item.id}`).remove();
+          }
+          return 0;
+        });
+      }
+    }
+    getCards();
+  };
+
+  const saveCity = (result, value) => {
+    if (result) {
+      if (result["column-1"]) {
+        result["column-1"].map((item, index) => {
+          return database.ref(`cards/${value}/${item.id}`).update({
+            votes: item.votes + (result["column-1"].length - index),
+          });
+        });
+      }
+
+      if (result["column-2"]) {
+        result["column-2"].map((item) => {
+          return database
+            .ref(`cards/${value}/${item.id}`)
+            .update({ spam_score: item.spam_score + 1 });
+        });
+        result["column-2"].map((item) => {
+          if (item.spam_score >= 2) {
+            return database.ref(`cards/${value}/${item.id}`).remove();
+          }
+          return 0;
+        });
+      }
     }
     getCards();
   };
@@ -72,7 +116,19 @@ const AppProvider = ({ children }) => {
   }, []);
 
   return (
-    <AppContext.Provider value={{ ...state, addCard, saveData }}>
+    <AppContext.Provider
+      value={{
+        ...state,
+        addCard,
+        saveCity,
+        setView,
+        viewMore,
+        save,
+        setSaving,
+        saveCountry,
+        settingGlobal,
+        global,
+      }}>
       {children}
     </AppContext.Provider>
   );

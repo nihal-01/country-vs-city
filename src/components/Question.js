@@ -44,7 +44,10 @@ function Question() {
 
   return (
     <Wrapper>
-      <div>
+      <h2 className='qst'>
+        What do you love about living in the country / city?.
+      </h2>
+      <div className='question'>
         What I love best about living in{" "}
         <select value={value} onChange={(e) => setValue(e.target.value)}>
           <option value='country'>Country</option>
@@ -74,8 +77,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  div {
-    font-size: 20px;
+  .question {
+    font-size: 17px;
     color: #222;
     letter-spacing: 1px;
     margin-top: 1.5em;
@@ -119,6 +122,12 @@ const Wrapper = styled.div`
     color: red;
     font-size: 14px;
     margin-top: 5px;
+  }
+  .qst {
+    text-align: center;
+    margin-top: 1.5em;
+    font-size: 20px;
+    color: #4eafa8;
   }
 `;
 
