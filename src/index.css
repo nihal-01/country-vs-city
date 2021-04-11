@@ -148,3 +148,16 @@ body {
 .view-more-btn:hover {
   color: #105854;
 }
+
+.single-card-text {
+  display: flex;
+  align-items: center;
+}
+
+.index-text {
+  font-weight: bold;
+  color: #157972;
+  padding: 1px;
+  letter-spacing: 0;
+  font-size: 14px !important;
+}

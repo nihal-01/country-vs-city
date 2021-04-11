@@ -11,7 +11,7 @@ function Question() {
     color: "",
   });
 
-  const { addCard } = useGlobalContext();
+  const { addCard, setSort, sort, global } = useGlobalContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,11 +19,6 @@ function Question() {
     if (text) {
       setAlert({ show: false, content: "", color: "" });
       addCard(value, text);
-      setAlert({
-        show: true,
-        content: `One Item Added To ${value.toUpperCase()}`,
-        color: "green",
-      });
       setText("");
     } else {
       setAlert({
@@ -69,6 +64,22 @@ function Question() {
           {alert.content}
         </p>
       )}
+      <div className='sort-wrapper'>
+        {global ? <h4>Global List</h4> : <h4>Local List</h4>}
+        {global && (
+          <div>
+            <label htmlFor=''>sort by : </label>
+            <select
+              name=''
+              id=''
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}>
+              <option value='time'>Time</option>
+              <option value='votes'>Votes</option>
+            </select>
+          </div>
+        )}
+      </div>
     </Wrapper>
   );
 }
@@ -128,6 +139,33 @@ const Wrapper = styled.div`
     margin-top: 1.5em;
     font-size: 20px;
     color: #4eafa8;
+  }
+  .sort-wrapper {
+    margin-top: 1.5em;
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h4 {
+      color: #333;
+      text-transform: capitalize;
+      letter-spacing: 1px;
+    }
+    label {
+      color: #333;
+      font-size: 15px;
+      margin-right: 1px;
+    }
+
+    select {
+      outline: none;
+      border: none;
+      padding: 3px;
+      letter-spacing: 1px;
+      font-size: 13px;
+    }
   }
 `;
 

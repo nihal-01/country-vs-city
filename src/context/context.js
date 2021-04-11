@@ -1,7 +1,9 @@
 import React from "react";
 import { reducer } from "../Reducer/reducer";
-import { GET_DATA, START_FETCH, NO_DATA } from "../actions";
+import { GET_DATA, START_FETCH, NO_DATA, GET_DATA_BY_TIME } from "../actions";
 import { database } from "../firebase/config";
+
+import { generateId } from "../utils/helpers";
 
 const AppContext = React.createContext();
 
@@ -14,21 +16,25 @@ const initialState = {
 
 const AppProvider = ({ children }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-
   const [viewMore, setViewMore] = React.useState(false);
   const [save, setSave] = React.useState(false);
   const [global, setGlobal] = React.useState(true);
+  const [sort, setSort] = React.useState("votes");
 
   const settingGlobal = () => {
     setGlobal(!global);
   };
 
   const addCard = (value, text) => {
+    const time = generateId();
     database.ref(`cards/${value}/${new Date().getTime().toString()}`).set({
       text,
       spam_score: 0,
       votes: 0,
+      time: time,
     });
+    setSort("time");
+    setGlobal(true);
   };
 
   const setSaving = (val) => setSave(val);
@@ -37,6 +43,8 @@ const AppProvider = ({ children }) => {
 
   const getCards = () => {
     dispatch({ type: START_FETCH });
+    setGlobal(true);
+
     var ref = database.ref("cards");
 
     // Attach an asynchronous callback to read the data at our posts reference
@@ -47,6 +55,28 @@ const AppProvider = ({ children }) => {
 
         if (data) {
           dispatch({ type: GET_DATA, payload: data });
+        } else {
+          dispatch({ type: NO_DATA });
+        }
+      },
+      function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+      }
+    );
+  };
+
+  const getCardsbyTime = () => {
+    dispatch({ type: START_FETCH });
+    setGlobal(true);
+
+    var ref = database.ref("cards");
+    ref.orderByChild("time").on(
+      "value",
+      (snapshot) => {
+        const data = snapshot.val();
+
+        if (data) {
+          dispatch({ type: GET_DATA_BY_TIME, payload: data });
         } else {
           dispatch({ type: NO_DATA });
         }
@@ -81,7 +111,11 @@ const AppProvider = ({ children }) => {
         });
       }
     }
-    getCards();
+    if (sort === "votes") {
+      getCards();
+    } else {
+      getCardsbyTime();
+    }
   };
 
   const saveCity = (result, value) => {
@@ -108,12 +142,20 @@ const AppProvider = ({ children }) => {
         });
       }
     }
-    getCards();
+    if (sort === "votes") {
+      getCards();
+    } else {
+      getCardsbyTime();
+    }
   };
 
   React.useEffect(() => {
-    getCards();
-  }, []);
+    if (sort === "votes") {
+      getCards();
+    } else {
+      getCardsbyTime();
+    }
+  }, [sort]);
 
   return (
     <AppContext.Provider
@@ -128,6 +170,8 @@ const AppProvider = ({ children }) => {
         saveCountry,
         settingGlobal,
         global,
+        sort,
+        setSort,
       }}>
       {children}
     </AppContext.Provider>

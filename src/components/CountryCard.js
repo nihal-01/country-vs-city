@@ -20,7 +20,10 @@ function Widget({ widget, index }) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}>
-          <p>{widget.text}</p>
+          <div className='single-card-text'>
+            <p className='index-text'>{index + 1}</p>
+            <p>{widget.text}</p>
+          </div>
           <img src={drag} alt='' />
         </div>
       )}
