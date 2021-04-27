@@ -32,7 +32,6 @@ const Wrapper = styled.section`
   display: flex;
   justify-content: center;
   width: 100%;
-  margin: 0.4em 0;
   margin-bottom: 2em;
 
   .card-wrapper {

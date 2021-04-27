@@ -1,4 +1,13 @@
-import { GET_DATA, GET_DATA_BY_TIME, NO_DATA, START_FETCH } from "../actions";
+import {
+  CHECK_IS_SUBSCRIBED,
+  GET_DATA,
+  GET_DATA_BY_TIME,
+  NO_DATA,
+  SAVE_SUBSCRIBE_DATA,
+  START_FETCH,
+  SUBSCRIBE_LOADING_START,
+  UNSUBSCRIBE,
+} from "../actions";
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -69,6 +78,29 @@ export const reducer = (state, action) => {
         dataError: false,
         loading: false,
       };
+    case CHECK_IS_SUBSCRIBED:
+      let localData = localStorage.getItem("subscribe");
+      if (localData) {
+        var isLogged = true;
+        var subscribe_data = JSON.parse(localStorage.getItem("subscribe"));
+      } else {
+        isLogged = false;
+        subscribe_data = {};
+      }
+      return { ...state, isLogged: isLogged, subscribeData: subscribe_data };
+    case SUBSCRIBE_LOADING_START:
+      return { ...state, subscribeLoading: true };
+    case SAVE_SUBSCRIBE_DATA:
+      localStorage.setItem("subscribe", JSON.stringify(action.payload));
+      return {
+        ...state,
+        isLogged: true,
+        subscribeData: action.payload,
+        subscribeLoading: false,
+      };
+    case UNSUBSCRIBE:
+      localStorage.removeItem("subscribe");
+      return { ...state, isLogged: false, subscribeData: {} };
     default:
       return state;
   }

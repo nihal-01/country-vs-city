@@ -11,7 +11,15 @@ function Question() {
     color: "",
   });
 
-  const { addCard, setSort, sort, global } = useGlobalContext();
+  const {
+    addCard,
+    setSort,
+    sort,
+    global,
+    isLogged,
+    subscribeLoading,
+    setModalOpen,
+  } = useGlobalContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,15 +58,27 @@ function Question() {
         </select>{" "}
         is...
       </div>
-      <form onSubmit={handleSubmit}>
-        <input
-          type='text'
-          placeholder='Add your reason here'
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <button type='submit'>ADD</button>
-      </form>
+      {isLogged ? (
+        <form onSubmit={handleSubmit}>
+          <input
+            type='text'
+            placeholder='Add your reason here'
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          <button type='submit'>ADD</button>
+        </form>
+      ) : subscribeLoading ? (
+        <div className='loading-wrapper-small'>
+          <div className='loading-small'></div>
+        </div>
+      ) : (
+        <div className='subscribe-text-wrapper'>
+          <p>Please subscribe to add cards !!!</p>
+          <button onClick={() => setModalOpen(true)}>Subscribe</button>
+        </div>
+      )}
+
       {alert.show && (
         <p className='error-text' style={{ color: alert.color }}>
           {alert.content}
@@ -100,6 +120,7 @@ const Wrapper = styled.div`
       outline: none;
       border: none;
       padding: 2px 4px;
+      background: white;
     }
   }
   form {
@@ -110,22 +131,27 @@ const Wrapper = styled.div`
     max-width: 95%;
 
     input {
-      padding: 5px;
+      padding: 10px;
       outline: none;
       width: 100%;
+      border: none;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
     }
 
     button {
       cursor: pointer;
       outline: none;
       border: none;
-      background: #4eafa8;
+      background: #000000;
       color: white;
       font-weight: bold;
       transition: 0.3s all linear;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
 
       &:hover {
-        background: #157972;
+        background: #000000b3;
       }
     }
   }
@@ -138,7 +164,7 @@ const Wrapper = styled.div`
     text-align: center;
     margin-top: 1.5em;
     font-size: 20px;
-    color: #4eafa8;
+    color: white;
   }
   .sort-wrapper {
     margin-top: 1.5em;
@@ -165,6 +191,33 @@ const Wrapper = styled.div`
       padding: 3px;
       letter-spacing: 1px;
       font-size: 13px;
+      background: white;
+    }
+  }
+  .subscribe-text-wrapper {
+    text-align: center;
+    margin-top: 0.7em;
+
+    p {
+      font-size: 14px;
+      color: #333;
+      letter-spacing: 1px;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      margin-top: 0.7em;
+      padding: 4px 8px;
+      background: #ff2929;
+      color: white;
+      font-weight: bold;
+      transition: 0.3s all linear;
+      border-radius: 2px;
+
+      &:hover {
+        background: #e60000;
+      }
     }
   }
 `;

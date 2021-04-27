@@ -1,7 +1,6 @@
 import React from "react";
 import { Draggable, Droppable, DragDropContext } from "react-beautiful-dnd";
 import { useGlobalContext } from "../context/context";
-import drag from "../assets/drag-icon.png";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -21,10 +20,9 @@ function Widget({ widget, index }) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}>
           <div className='single-card-text'>
-            <p className='index-text'>{index + 1}</p>
             <p>{widget.text}</p>
           </div>
-          <img src={drag} alt='' />
+          <p className='index-text'>{index + 1}</p>
         </div>
       )}
     </Draggable>
@@ -59,10 +57,16 @@ function Column({ droppableId, widgets }) {
   );
 }
 
-const getLoaclStorage = () => {
+const getLoaclStorage = (viewMore) => {
   if (localStorage.getItem("country")) {
     let dt = localStorage.getItem("country");
-    return JSON.parse(dt);
+    if (viewMore) {
+      return JSON.parse(dt);
+    } else {
+      let array = JSON.parse(dt)["column-1"].slice(0, 10);
+      let newObj = { "column-1": array, "column-2": [] };
+      return newObj;
+    }
   } else {
     return [];
   }
@@ -79,7 +83,7 @@ function CountryCard({ data }) {
   } = useGlobalContext();
 
   const [state, setState] = React.useState({
-    widgets: global ? data : getLoaclStorage(),
+    widgets: global ? data : getLoaclStorage(viewMore),
   });
 
   const getShowLessList = (data) => {
@@ -96,7 +100,7 @@ function CountryCard({ data }) {
         ? viewMore
           ? countryData
           : getShowLessList(countryData)
-        : getLoaclStorage(),
+        : getLoaclStorage(viewMore),
     });
   }, [countryData, global, viewMore]);
 
@@ -153,13 +157,7 @@ function CountryCard({ data }) {
           });
         }
 
-        if (state.widgets["column-2"]) {
-          var nspamItems = state.widgets["column-2"].filter((item) => {
-            return item.spam_score < 2;
-          });
-        }
-
-        let localItem = { "column-1": nitems, "column-2": nspamItems };
+        let localItem = { "column-1": nitems, "column-2": [] };
         localStorage.setItem(value, JSON.stringify(localItem));
       }
     }

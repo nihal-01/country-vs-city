@@ -1,7 +1,16 @@
 import React from "react";
 import { reducer } from "../Reducer/reducer";
-import { GET_DATA, START_FETCH, NO_DATA, GET_DATA_BY_TIME } from "../actions";
-import { database } from "../firebase/config";
+import {
+  GET_DATA,
+  START_FETCH,
+  NO_DATA,
+  GET_DATA_BY_TIME,
+  CHECK_IS_SUBSCRIBED,
+  SAVE_SUBSCRIBE_DATA,
+  UNSUBSCRIBE,
+  SUBSCRIBE_LOADING_START,
+} from "../actions";
+import { database, firestore } from "../firebase/config";
 
 import { generateId } from "../utils/helpers";
 
@@ -12,6 +21,9 @@ const initialState = {
   cityData: [],
   loading: true,
   dataError: false,
+  isLogged: false,
+  subscribeData: {},
+  subscribeLoading: false,
 };
 
 const AppProvider = ({ children }) => {
@@ -20,6 +32,8 @@ const AppProvider = ({ children }) => {
   const [save, setSave] = React.useState(false);
   const [global, setGlobal] = React.useState(true);
   const [sort, setSort] = React.useState("votes");
+
+  const [modalOpen, setModalOpen] = React.useState(false);
 
   const settingGlobal = () => {
     setGlobal(!global);
@@ -111,11 +125,9 @@ const AppProvider = ({ children }) => {
         });
       }
     }
-    if (sort === "votes") {
-      getCards();
-    } else {
-      getCardsbyTime();
-    }
+    getCards();
+    setSort("votes");
+    setGlobal(false);
   };
 
   const saveCity = (result, value) => {
@@ -142,11 +154,32 @@ const AppProvider = ({ children }) => {
         });
       }
     }
-    if (sort === "votes") {
-      getCards();
-    } else {
-      getCardsbyTime();
-    }
+    getCards();
+    setSort("votes");
+    setGlobal(false);
+  };
+
+  const checkIsSubscribed = () => {
+    dispatch({ type: CHECK_IS_SUBSCRIBED });
+  };
+
+  React.useEffect(() => {
+    checkIsSubscribed();
+  }, []);
+
+  const saveSubscribeData = (value) => {
+    dispatch({ type: SUBSCRIBE_LOADING_START });
+    const collectionRef = firestore.collection("subscribers");
+    collectionRef
+      .doc(value.email)
+      .set({ name: value.name, email: value.email, intrest: value.intrest })
+      .then(() => {
+        dispatch({ type: SAVE_SUBSCRIBE_DATA, payload: value });
+      });
+  };
+
+  const unSubscribe = () => {
+    dispatch({ type: UNSUBSCRIBE });
   };
 
   React.useEffect(() => {
@@ -172,6 +205,10 @@ const AppProvider = ({ children }) => {
         global,
         sort,
         setSort,
+        saveSubscribeData,
+        unSubscribe,
+        modalOpen,
+        setModalOpen,
       }}>
       {children}
     </AppContext.Provider>

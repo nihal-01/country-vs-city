@@ -9,12 +9,13 @@ html {
 }
 
 body {
+  background-color: #a9c5ff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 .column-div:nth-child(1) {
-  background-color: #efefef;
+  background-color: #ffffff50;
   min-height: 100px;
   margin-top: 2em;
   padding: 10px;
@@ -22,13 +23,14 @@ body {
 
 .single-card {
   background-color: #ffffff;
-  margin-bottom: 5px;
-  padding: 10px;
+  margin-bottom: 7px;
+  padding: 13px;
   letter-spacing: 1px;
   text-transform: capitalize;
   color: #222;
   display: flex;
   justify-content: space-between;
+  border-radius: 3px;
 }
 
 .single-card img {
@@ -43,7 +45,7 @@ body {
 }
 
 .column-div:nth-child(2) {
-  background-color: #efefef;
+  background-color: #ffffff50;
   min-height: 100px;
   margin-top: 3.5em;
   padding: 10px;
@@ -55,7 +57,7 @@ body {
   position: absolute;
   top: -28px;
   left: 0;
-  color: darkred;
+  color: black;
 }
 
 .save-btn,
@@ -63,10 +65,9 @@ body {
   border: none;
   outline: none;
   cursor: pointer;
-
   margin-right: 1em;
   color: white;
-  background-color: #4eafa8;
+  background-color: #4e78af;
   padding: 4px 10px;
   border-radius: 2px;
   font-weight: bold;
@@ -75,7 +76,7 @@ body {
 
 .save-btn:hover,
 .global-btn:hover {
-  background: #157972;
+  background: #245492;
 }
 
 .no-cards-found {
@@ -98,7 +99,7 @@ body {
   height: 90px;
   border: 4px solid #e2e2e2;
   border-radius: 50%;
-  border-top: 4px solid #4eafa8;
+  border-top: 4px solid #4e78af;
   animation: spin 1s linear infinite;
 }
 
@@ -120,7 +121,7 @@ body {
 
 .card-error {
   font-size: 14px;
-  color: darkred;
+  color: #f3000070;
 }
 
 .bottom-btn-wrapper {
@@ -140,13 +141,13 @@ body {
   background-color: transparent;
   cursor: pointer;
   text-decoration: underline;
-  color: #4eafa8;
+  color: white;
   transition: 0.3s all linear;
   letter-spacing: 1px;
 }
 
 .view-more-btn:hover {
-  color: #105854;
+  color: white;
 }
 
 .single-card-text {
@@ -156,8 +157,40 @@ body {
 
 .index-text {
   font-weight: bold;
-  color: #157972;
+  color: white;
   padding: 1px;
   letter-spacing: 0;
-  font-size: 14px !important;
+  font-size: 12px !important;
+  background-image: linear-gradient(#e8455a, #ef6040);
+  border-radius: 50%;
+  min-width: 22px;
+  min-height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-wrapper-small {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1em;
+}
+
+.loading-small {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e2e2;
+  border-radius: 50%;
+  border-top: 4px solid #4e78af;
+  animation: sp 1s linear infinite;
+}
+
+@keyframes sp {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

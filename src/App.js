@@ -1,7 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import { Home, ErrorPage, Subscribe } from "./pages";
+import { Home, ErrorPage } from "./pages";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -10,13 +11,11 @@ function App() {
         <Route exact path='/'>
           <Home />
         </Route>
-        <Route path='/subscribe'>
-          <Subscribe />
-        </Route>
         <Route path='*'>
           <ErrorPage />
         </Route>
       </Switch>
+      <Footer />
     </Router>
   );
 }
